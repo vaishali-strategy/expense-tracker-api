@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+sqlalchemy>=2
+psycopg[binary]>=3.2
+alembic
+pydantic-settings
+pyjwt
+bcrypt
+email-validator

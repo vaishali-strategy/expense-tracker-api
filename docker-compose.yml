@@ -1,0 +1,30 @@
+# One command to run everything locally:  docker compose up --build
+# The API is then at http://localhost:8000 (interactive docs at /docs).
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: expense
+      POSTGRES_PASSWORD: expense
+      POSTGRES_DB: expense
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U expense -d expense"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: .
+    environment:
+      DATABASE_URL: postgresql+psycopg://expense:expense@db:5432/expense
+      SECRET_KEY: local-compose-secret-not-for-production-0123456789abcdef
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
