@@ -111,7 +111,7 @@ uvicorn app.main:app --reload             # http://localhost:8000/docs
 
 ```bash
 createdb expense_test                     # once
-python -m pytest -q                       # 82 tests, about 4 seconds
+python -m pytest -q                       # 84 tests, about 4 seconds
 ```
 
 The tests run against a real PostgreSQL database (`TEST_DATABASE_URL`, default
@@ -156,23 +156,44 @@ them. These are local numbers for one table size, not a promise about any other 
 
 ## Deploy a live URL
 
-The app runs on **Render's free web service**; the database is a **free Neon PostgreSQL**. (Render's own free
-Postgres is deleted 30 days after creation, which would break the link. Neon's free plan is not deleted for
-inactivity.) No credit card is needed for either free plan, as of when this was written. Check their pages
-if anything differs.
+The app runs on **Vercel's free Hobby plan** and the database is a **free Neon PostgreSQL**. Neither needs a
+payment card as far as their docs describe (check at signup; if either asks for one, stop). Vercel's Hobby
+plan is for personal, non-commercial use, which a portfolio project is. Neon's free projects are not paused
+or deleted for inactivity.
 
-1. **Database.** Create a project at [neon.com](https://neon.com), and copy the **direct** connection string
-   (it starts with `postgresql://` and ends with `?sslmode=require`).
-2. **Code.** Push this repository to GitHub.
-3. **App.** On [render.com](https://render.com): **New, then Blueprint**, pick the repository. Render reads
-   `render.yaml`, generates `SECRET_KEY` for you, and asks for `DATABASE_URL`: paste the Neon string.
-4. Render builds the Dockerfile. On start, `start.sh` runs `alembic upgrade head` (creates the tables) and
-   then the server.
-5. Open `https://<your-service>.onrender.com/health` (should say `{"status":"ok"}`) and `/docs`. Put that URL
-   at the top of this README and on your resume.
+1. **Database.** Create a project at [neon.com](https://neon.com). Copy the **pooled** connection string (the
+   host contains `-pooler`; it starts with `postgresql://` and ends with `?sslmode=require`).
+2. **Create the tables, once, from your laptop** (the venv from "Run it without Docker" active):
+   ```bash
+   DATABASE_URL='<paste the Neon string>' alembic upgrade head
+   ```
+3. **Code.** Push this repository to GitHub.
+4. **App.** On [vercel.com](https://vercel.com), sign in with GitHub, choose **Add New, Project**, and import the
+   repository. Vercel detects FastAPI by itself (`index.py` and `pyproject.toml` tell it where the app is).
+   Under **Environment Variables** add:
 
-Good to know: the free web service sleeps after 15 minutes without traffic, and the first request afterwards
-takes about a minute. Open the link yourself shortly before sharing it.
+   | Name | Value |
+   |---|---|
+   | `DATABASE_URL` | the Neon string |
+   | `SECRET_KEY` | a long random string: `python -c "import secrets; print(secrets.token_urlsafe(48))"` |
+   | `APP_ENV` | `production` |
+
+   Click **Deploy**.
+5. **Check it.** Open `https://<your-project>.vercel.app/health` (should say `{"status":"ok"}`) and `/docs`
+   **in a private browser window**. If it asks you to log in to Vercel, open the project's **Settings, then
+   Deployment Protection** and turn Vercel Authentication off for production. Then put the URL at the top of
+   this README and on your resume.
+
+Notes:
+
+- The API runs as serverless functions, so the first request after a quiet period is slower. The database
+  also suspends after a few idle minutes and wakes on the next query. Open the link yourself shortly before
+  sharing it.
+- On Vercel the app opens a database connection per request and relies on Neon's pooler (the code switches
+  its own pool off when the `VERCEL` variable is set).
+- When the schema changes, run `alembic upgrade head` against the Neon string again before deploying.
+- `docker compose up --build` remains the way to run everything locally, and the `Dockerfile` works on any
+  host that runs containers.
 
 ## Project layout
 
@@ -186,10 +207,11 @@ app/
   security.py      password hashing and JWT
   deps.py          "who is calling?" (the current user)
   routers/         auth.py, expenses.py, reports.py
-alembic/           database migrations
-tests/             82 tests against a real PostgreSQL
+alembic/           database migrations (run with `alembic upgrade head`)
+tests/             84 tests against a real PostgreSQL
 scripts/           index_benchmark.py
-Dockerfile  docker-compose.yml  render.yaml  start.sh  .github/workflows/ci.yml
+index.py           entry point Vercel uses (re-exports the app)
+Dockerfile  docker-compose.yml  start.sh  .github/workflows/ci.yml  .vercelignore
 ```
 
 ## Limits (deliberately simple)

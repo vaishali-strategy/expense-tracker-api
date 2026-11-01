@@ -1,3 +1,6 @@
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 filterwarnings = ["error::DeprecationWarning:app", "error::DeprecationWarning:tests"]
+
+[tool.vercel]
+entrypoint = "index:app"

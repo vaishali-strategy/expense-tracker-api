@@ -1,0 +1,9 @@
+.venv
+.git
+.github
+tests
+scripts
+docker-compose.yml
+Dockerfile
+start.sh
+README.md

@@ -120,3 +120,24 @@ def test_production_refuses_to_start_with_the_default_secret(monkeypatch):
     with pytest.raises(RuntimeError, match="SECRET_KEY"):
         with TestClient(main.app):
             pass
+
+
+def test_vercel_entry_point_exposes_the_app():
+    import index
+
+    from app.main import app
+
+    assert index.app is app
+
+
+def test_database_pooling_is_switched_off_on_vercel():
+    """On Vercel the engine must not keep its own pool; elsewhere it does."""
+    import subprocess
+    import sys
+
+    code = "from app.db import engine; print(type(engine.pool).__name__)"
+    run = lambda extra: subprocess.run(  # noqa: E731
+        [sys.executable, "-c", code], capture_output=True, text=True, env={**__import__("os").environ, **extra}
+    ).stdout.strip()
+    assert run({"VERCEL": "1"}) == "NullPool"
+    assert run({"VERCEL": ""}) != "NullPool"
