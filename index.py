@@ -1,4 +1,4 @@
 """Entry point for Vercel: it looks for a FastAPI object called `app` in this module
-(see [tool.vercel] in pyproject.toml). Running locally uses app.main:app directly."""
+(a root-level index.py is one of the file names Vercel looks for). Running locally uses expense_api.main:app directly."""
 
-from app.main import app  # noqa: F401
+from expense_api.main import app  # noqa: F401

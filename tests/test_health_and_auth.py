@@ -4,8 +4,8 @@ import jwt
 import pytest
 from sqlalchemy import text
 
-from app.config import get_settings
-from app.db import engine
+from expense_api.config import get_settings
+from expense_api.db import engine
 from tests.conftest import PASSWORD, register
 
 
@@ -113,8 +113,8 @@ def test_token_for_a_user_that_no_longer_exists_is_rejected(client):
 def test_production_refuses_to_start_with_the_default_secret(monkeypatch):
     from fastapi.testclient import TestClient
 
-    from app import main
-    from app.config import DEFAULT_SECRET, Settings
+    from expense_api import main
+    from expense_api.config import DEFAULT_SECRET, Settings
 
     monkeypatch.setattr(main, "get_settings", lambda: Settings(app_env="production", secret_key=DEFAULT_SECRET))
     with pytest.raises(RuntimeError, match="SECRET_KEY"):
@@ -125,7 +125,7 @@ def test_production_refuses_to_start_with_the_default_secret(monkeypatch):
 def test_vercel_entry_point_exposes_the_app():
     import index
 
-    from app.main import app
+    from expense_api.main import app
 
     assert index.app is app
 
@@ -135,9 +135,34 @@ def test_database_pooling_is_switched_off_on_vercel():
     import subprocess
     import sys
 
-    code = "from app.db import engine; print(type(engine.pool).__name__)"
+    code = "from expense_api.db import engine; print(type(engine.pool).__name__)"
     run = lambda extra: subprocess.run(  # noqa: E731
         [sys.executable, "-c", code], capture_output=True, text=True, env={**__import__("os").environ, **extra}
     ).stdout.strip()
     assert run({"VERCEL": "1"}) == "NullPool"
     assert run({"VERCEL": ""}) != "NullPool"
+
+
+def test_vercel_finds_exactly_one_entry_point():
+    """Vercel starts the first of these file names it finds. A folder called app/ holding a main.py
+    was picked instead of index.py and then failed to import itself, so only index.py may exist."""
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parent.parent
+    names = ["app.py", "index.py", "server.py", "main.py", "wsgi.py", "asgi.py"]
+    found = [str(base.relative_to(root) / n) for base in (root, root / "app", root / "src") for n in names if (base / n).exists()]
+    assert found == ["index.py"]
+
+
+def test_pyproject_dependencies_match_requirements_txt():
+    """The same pinned versions are listed in both places (see the note at the top of pyproject.toml)."""
+    import re
+    import tomllib
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parent.parent
+    listed = tomllib.loads((root / "pyproject.toml").read_text())["project"]["dependencies"]
+    requirements = (root / "requirements.txt").read_text().lower()
+    for dependency in listed:
+        name, version = re.match(r"([a-z0-9\-]+)(?:\[[^\]]*\])?==(.+)", dependency.lower()).groups()
+        assert f"{name}=={version}" in requirements, dependency

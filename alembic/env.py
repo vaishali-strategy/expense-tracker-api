@@ -3,8 +3,8 @@
 from alembic import context
 from sqlalchemy import create_engine, pool
 
-from app.config import get_settings
-from app.models import Base
+from expense_api.config import get_settings
+from expense_api.models import Base
 
 target_metadata = Base.metadata
 

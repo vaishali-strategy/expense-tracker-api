@@ -6,7 +6,7 @@ from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
-from app.models import Category
+from expense_api.models import Category
 
 
 class Credentials(BaseModel):

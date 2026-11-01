@@ -1,6 +1,22 @@
+# The runtime dependencies are listed twice on purpose: requirements.txt is what Docker and CI
+# install, and this table is what hosts that read pyproject.toml (such as Vercel) install.
+# requirements.txt is the full pinned set; keep the versions here equal to the ones in it.
+[project]
+name = "expense-tracker-api"
+version = "1.0.0"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.162.0",
+    "uvicorn[standard]==0.54.0",
+    "sqlalchemy==2.1.6",
+    "psycopg[binary]==3.3.6",
+    "alembic==1.20.1",
+    "pydantic-settings==2.16.2",
+    "pyjwt==2.15.1",
+    "bcrypt==5.0.0",
+    "email-validator==2.3.0",
+]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-filterwarnings = ["error::DeprecationWarning:app", "error::DeprecationWarning:tests"]
-
-[tool.vercel]
-entrypoint = "index:app"
+filterwarnings = ["error::DeprecationWarning:expense_api", "error::DeprecationWarning:tests"]

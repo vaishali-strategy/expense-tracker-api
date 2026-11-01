@@ -4,10 +4,10 @@ from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
-from app.deps import DbSession
-from app.models import User
-from app.schemas import Credentials, TokenOut, UserOut
-from app.security import create_access_token, hash_password, verify_password
+from expense_api.deps import DbSession
+from expense_api.models import User
+from expense_api.schemas import Credentials, TokenOut, UserOut
+from expense_api.security import create_access_token, hash_password, verify_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

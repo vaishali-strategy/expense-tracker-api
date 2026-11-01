@@ -4,8 +4,8 @@ from alembic.autogenerate import compare_metadata
 from alembic.migration import MigrationContext
 from sqlalchemy import text
 
-from app.db import engine
-from app.models import Base
+from expense_api.db import engine
+from expense_api.models import Base
 
 
 def test_models_match_the_migrations():

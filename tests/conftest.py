@@ -16,8 +16,8 @@ from alembic.config import Config
 from fastapi.testclient import TestClient
 from sqlalchemy import text
 
-from app.db import engine
-from app.main import app
+from expense_api.db import engine
+from expense_api.main import app
 
 
 @pytest.fixture(scope="session", autouse=True)

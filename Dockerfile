@@ -9,7 +9,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY alembic.ini start.sh ./
 COPY alembic ./alembic
-COPY app ./app
+COPY expense_api ./expense_api
 
 # Do not run as root inside the container.
 RUN useradd --create-home appuser && chown -R appuser /app

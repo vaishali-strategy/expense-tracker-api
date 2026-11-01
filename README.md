@@ -90,7 +90,7 @@ pip install -r requirements-dev.txt
 createdb expense_dev                      # or any database you like
 cp .env.example .env                      # then edit DATABASE_URL and SECRET_KEY
 alembic upgrade head                      # create the tables
-uvicorn app.main:app --reload             # http://localhost:8000/docs
+uvicorn expense_api.main:app --reload             # http://localhost:8000/docs
 ```
 
 ## Design decisions
@@ -111,7 +111,7 @@ uvicorn app.main:app --reload             # http://localhost:8000/docs
 
 ```bash
 createdb expense_test                     # once
-python -m pytest -q                       # 84 tests, about 4 seconds
+python -m pytest -q                       # 86 tests, about 4 seconds
 ```
 
 The tests run against a real PostgreSQL database (`TEST_DATABASE_URL`, default
@@ -169,7 +169,7 @@ or deleted for inactivity.
    ```
 3. **Code.** Push this repository to GitHub.
 4. **App.** On [vercel.com](https://vercel.com), sign in with GitHub, choose **Add New, Project**, and import the
-   repository. Vercel detects FastAPI by itself (`index.py` and `pyproject.toml` tell it where the app is).
+   repository. Vercel detects FastAPI by itself and finds the app in the root-level `index.py`.
    Under **Environment Variables** add:
 
    | Name | Value |
@@ -198,7 +198,7 @@ Notes:
 ## Project layout
 
 ```
-app/
+expense_api/
   main.py          the FastAPI app, /health, startup check
   config.py        settings from environment variables
   db.py            database engine and per-request session
@@ -208,7 +208,7 @@ app/
   deps.py          "who is calling?" (the current user)
   routers/         auth.py, expenses.py, reports.py
 alembic/           database migrations (run with `alembic upgrade head`)
-tests/             84 tests against a real PostgreSQL
+tests/             86 tests against a real PostgreSQL
 scripts/           index_benchmark.py
 index.py           entry point Vercel uses (re-exports the app)
 Dockerfile  docker-compose.yml  start.sh  .github/workflows/ci.yml  .vercelignore

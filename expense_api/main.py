@@ -6,9 +6,9 @@ from fastapi import FastAPI, HTTPException, status
 from fastapi.responses import RedirectResponse
 from sqlalchemy import text
 
-from app.config import DEFAULT_SECRET, get_settings
-from app.db import engine
-from app.routers import auth, expenses, reports
+from expense_api.config import DEFAULT_SECRET, get_settings
+from expense_api.db import engine
+from expense_api.routers import auth, expenses, reports
 
 
 @asynccontextmanager

@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 import bcrypt
 import jwt
 
-from app.config import get_settings
+from expense_api.config import get_settings
 
 ALGORITHM = "HS256"
 

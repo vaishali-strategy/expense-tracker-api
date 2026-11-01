@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import NullPool
 
-from app.config import get_settings
+from expense_api.config import get_settings
 
 # prepare_threshold=None: do not use server-side prepared statements, so the app also works behind
 # a connection pooler (such as the "pooled" connection strings some hosts offer).

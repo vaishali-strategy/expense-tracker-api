@@ -15,7 +15,7 @@ from datetime import date
 from sqlalchemy import create_engine, text
 
 sys.path.insert(0, ".")
-from app.config import get_settings  # noqa: E402
+from expense_api.config import get_settings  # noqa: E402
 
 USERS, PER_USER, RUNS = 1000, 1000, 5
 

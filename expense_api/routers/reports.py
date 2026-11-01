@@ -7,9 +7,9 @@ from typing import Annotated
 from fastapi import APIRouter, Query
 from sqlalchemy import extract, func, select
 
-from app.deps import CurrentUser, DbSession
-from app.models import Expense
-from app.schemas import CategoryTotal, MonthlyReport, MonthTotal
+from expense_api.deps import CurrentUser, DbSession
+from expense_api.models import Expense
+from expense_api.schemas import CategoryTotal, MonthlyReport, MonthTotal
 
 router = APIRouter(prefix="/reports", tags=["reports"])
 

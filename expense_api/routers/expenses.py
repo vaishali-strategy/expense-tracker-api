@@ -6,9 +6,9 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Query, Response, status
 from sqlalchemy import func, select
 
-from app.deps import CurrentUser, DbSession
-from app.models import Category, Expense
-from app.schemas import ExpenseCreate, ExpenseOut, ExpensePage, ExpenseUpdate, Period
+from expense_api.deps import CurrentUser, DbSession
+from expense_api.models import Category, Expense
+from expense_api.schemas import ExpenseCreate, ExpenseOut, ExpensePage, ExpenseUpdate, Period
 
 router = APIRouter(prefix="/expenses", tags=["expenses"])
 
